@@ -1,5 +1,5 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { createContext, useContext, useState } from "react";
+import { Navigate, redirect, useNavigate } from "react-router-dom";
 import { AuthContextProviderProps, Login } from "../types";
 import axios from "axios";
 
@@ -15,9 +15,7 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
     });
     const [token, setToken] = useState(sessionStorage.getItem("token"));
     const [isLoading, setIsLoading] = useState(false);
-
-    const navigate = useNavigate();
-
+    // const navigate = useNavigate();
     const handleLogin = async (loginData: Login) => {
         setIsLoading(true);
         setErr("");
@@ -30,7 +28,7 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
             sessionStorage.setItem("user", JSON.stringify(data.user));
             sessionStorage.setItem("token", data.token);
 
-            navigate("/active-listings");
+            redirect("/active-listings");
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 setErr(
@@ -47,7 +45,6 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
         setUser(null);
         setToken(null);
         sessionStorage.clear();
-        navigate("/login");
     };
 
     return (
@@ -57,9 +54,9 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
                 token,
                 isLoading,
                 err,
+
                 handleLogin,
                 handleLogout,
-                setErr,
             }}
         >
             {children}

@@ -10,13 +10,28 @@ export interface User {
 }
 
 export interface Listing {
-    id: string;
+    _id: string;
     title: string;
     description: string;
     price: number;
+    image_url: string;
     category: string;
     comments: [];
+    status: boolean;
     creator: string;
+    created_at: string;
+}
+
+export interface ListingInput {
+    title: string;
+    description: string;
+    price: number;
+    image_url: string;
+    category: string;
+}
+
+export interface Listings {
+    listings: Listing[];
 }
 
 export interface Login {

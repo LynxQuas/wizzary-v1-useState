@@ -13,7 +13,7 @@ import InputError from "../components/ui/InputError";
 import { useUser } from "../ctx/authContext";
 
 const LoginPage = () => {
-    const { token, isLoading, handleLogin, err, setErr } = useUser();
+    const { token, isLoading, handleLogin, err } = useUser();
 
     const navigate = useNavigate();
 
@@ -32,6 +32,7 @@ const LoginPage = () => {
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         handleLogin(userInput);
+        setUserInput((prev) => ({ ...prev, email: "", password: "" }));
     };
 
     useEffect(() => {
@@ -39,11 +40,6 @@ const LoginPage = () => {
             navigate("/active-listings");
         }
     }, [token, navigate]);
-
-    // clean the input error after leaving the login page.
-    useEffect(() => {
-        setErr("");
-    });
 
     return (
         <form
@@ -70,7 +66,9 @@ const LoginPage = () => {
                 onChange={(e) => handleInputChange(e, "password")}
             />
             <Button
-                label={isLoading ? "loading" : "Login"}
+                label={isLoading ? "Submitting" : "Login"}
+                disabled={isLoading}
+                type="submit"
                 className="bg-neutral-700 text-white py-3"
             />
             <p>
