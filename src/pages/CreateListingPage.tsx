@@ -6,7 +6,7 @@ import TextArea from "../components/ui/TextArea";
 import { Listing } from "../types";
 import axios from "axios";
 import InputError from "../components/ui/InputError";
-import { redirect, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const options = [
     { label: "Magic Wands", value: "magic-wands" },
