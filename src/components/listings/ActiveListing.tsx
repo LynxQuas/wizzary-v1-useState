@@ -49,7 +49,11 @@ const ActiveListing = () => {
         <div className="flex gap-4 md:px-10 flex-wrap md:justify-normal">
             {error && <h1>{error}</h1>}
 
-            {activeListings?.length === 0 && <h1>No active Listings</h1>}
+            {activeListings?.length === 0 && (
+                <h1 className="text-2xl my-20 text-center">
+                    No active Listings
+                </h1>
+            )}
 
             {activeListings?.map((listing) => (
                 <Card key={listing._id} listing={listing} />

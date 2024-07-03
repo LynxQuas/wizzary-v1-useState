@@ -19,7 +19,7 @@ export interface Listing {
     comments: [];
     status: boolean;
     creator: string;
-    created_at: string;
+    createdAt: string;
 }
 
 export interface ListingInput {
@@ -34,8 +34,8 @@ export interface Listings {
     listings: Listing[];
 }
 
-export interface Login {
-    name: string;
+export interface LoginInput {
+    email: string;
     password: string;
 }
 

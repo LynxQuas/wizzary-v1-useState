@@ -4,51 +4,53 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { Listing } from "../types";
 import { ClipLoader } from "react-spinners";
-import { useUser } from "../ctx/authContext";
 
 const ListingDetailPage = () => {
     const { id } = useParams();
-    const { token, user } = useUser();
-    const navigate = useNavigate();
+    console.log(id);
 
     const [curListing, setCurListing] = useState<Listing | null>(null);
-    const [listingCreator, setListingCreator] = useState<any>(null);
-    const [err, setErr] = useState("");
     const [loading, setLoading] = useState(false);
+    const [err, setErr] = useState("");
+    const navigate = useNavigate();
 
-    useEffect(() => {
-        if (!token || !user._id) {
-            navigate("/login");
+    const handleDeleteListing = async () => {
+        const confirm = window.confirm("Are you sure ?");
+
+        if (!confirm) return;
+
+        try {
+            const deletedListing = await axios.delete(
+                `http://localhost:5000/api/listing/${id}`
+            );
+            navigate("/active-listings");
+        } catch (err) {
+            console.log(err);
         }
-    }, [token, user]);
+    };
 
     useEffect(() => {
-        setLoading(true);
         const getListing = async () => {
+            setLoading(true);
             try {
                 const { data } = await axios.get(
                     `http://localhost:5000/api/listing/${id}`
                 );
-
-                const { data: user } = await axios.get(
-                    `http://localhost:5000/api/user/${data.listing.creator}`
-                );
-                setListingCreator(user);
                 setCurListing(data.listing);
             } catch (err) {
                 if (axios.isAxiosError(err)) {
                     setErr(
-                        err.response?.data.message || "Something went wrong."
+                        err.response?.data.message || "something went wrong."
                     );
                 } else {
-                    setErr("Something went wrong try again.");
+                    setErr("An unknow error occurred.");
                 }
             } finally {
                 setLoading(false);
             }
         };
         getListing();
-    }, [id]);
+    }, []);
 
     if (loading) {
         return (
@@ -65,13 +67,15 @@ const ListingDetailPage = () => {
     }
 
     if (err) {
-        return <h1 className="text-2xl text-center text-red-500">{err}</h1>;
+        return (
+            <h1 className="text-2xl text-center my-20 text-red-500">{err}</h1>
+        );
     }
 
     return (
         <div className="my-4 relative -z-0">
             <div className="flex flex-col md:flex-col lg:flex-row gap-6 bg-white py-10 px-5 rounded-md shadow-md">
-                <LisingControls name={curListing?.creator} />
+                <LisingControls onDelete={handleDeleteListing} />
 
                 <div className="shrink-0 w-full md:w-1/2">
                     <img
@@ -84,11 +88,11 @@ const ListingDetailPage = () => {
                         <div className="flex items-center gap-4">
                             <div className="w-[3rem] h-[3rem] bg-black rounded-full"></div>
                             <p className="font-bold">
-                                {listingCreator?.user.name}
+                                {/* {listingCreator?.user.name} */}
                             </p>
                         </div>
                         <small className="text-gray-400">
-                            Created at {curListing?.created_at}
+                            Created at {curListing?.createdAt}
                         </small>
                     </div>
                     <h1 className="text-3xl font-bold text-amber-400 text-gary-200">
@@ -113,18 +117,16 @@ const ListingDetailPage = () => {
                             ${Number(curListing?.price).toFixed(2)}
                         </span>
                     </p>
-                    {token && (
-                        <div className="flex gap-4">
-                            <button className="bg-neutral-700 font-semibold text-white w-[10rem] px-4 py-2 rounded-md">
-                                Add Bid
-                            </button>
-                            {curListing?.creator === user._id ? (
-                                <button className="bg-amber-600 font-semibold text-white w-[10rem] px-4 py-2 rounded-md">
-                                    Close
-                                </button>
-                            ) : null}
-                        </div>
-                    )}
+
+                    <div className="flex gap-4">
+                        <button className="bg-neutral-700 font-semibold text-white w-[10rem] px-4 py-2 rounded-md">
+                            Add Bid
+                        </button>
+
+                        <button className="bg-amber-600 font-semibold text-white w-[10rem] px-4 py-2 rounded-md">
+                            Close
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

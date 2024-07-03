@@ -1,12 +1,11 @@
-import { FormEvent, useReducer, useState } from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
 import Select from "../components/ui/Select";
 import TextArea from "../components/ui/TextArea";
-import { ListingInput } from "../types";
+import { Listing } from "../types";
 import axios from "axios";
 import InputError from "../components/ui/InputError";
-import { useUser } from "../ctx/authContext";
 import { redirect, useNavigate } from "react-router-dom";
 
 const options = [
@@ -17,70 +16,67 @@ const options = [
     { label: "Others", value: "others" },
 ];
 
-const INITIAL_STATE = {
-    title: "",
-    image_url: "",
-    price: "",
-    description: "",
-    category: "magic-wands",
-};
+const CreateListingPage = ({
+    isEditing,
+    editingListing,
+}: {
+    isEditing?: boolean;
+    editingListing?: Listing;
+}) => {
+    const [createListingInputs, setCreateListingInputs] = useState({
+        title: editingListing?.title || "",
+        description: editingListing?.description || "",
+        price: editingListing?.price || "",
+        image_url: editingListing?.image_url || "",
+        category: editingListing?.category || "others",
+    });
 
-const reducer = (state: ListingInput, action: any) => {
-    switch (action.type) {
-        case "create/title":
-            return { ...state, title: action.payload };
-        case "create/image_url":
-            return { ...state, image_url: action.payload };
-        case "create/price":
-            return { ...state, price: action.payload };
-        case "create/description":
-            return { ...state, description: action.payload };
-        case "create/category":
-            return { ...state, category: action.payload };
-    }
-    return state;
-};
-
-const CreateListingPage = () => {
-    const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
     const [err, setErr] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
-    const [loading, setLoading] = useState(false);
-    const { user, token } = useUser();
 
-    const handleSubmit = async (e: FormEvent) => {
+    const handleInputsChange = (
+        e: ChangeEvent<
+            HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+        >,
+        name: string
+    ) => {
+        setCreateListingInputs((prev) => ({ ...prev, [name]: e.target.value }));
+    };
+
+    const handleCreateListing = async (e: FormEvent) => {
         e.preventDefault();
-        setLoading(true);
-        setErr("");
+        let response;
+        setIsLoading(true);
         try {
-            const { data } = await axios.post(
-                "http://localhost:5000/api/listing",
-                { ...state, creator: user._id },
-                {
-                    headers: {
-                        "Content-Type": "application/json",
-                        authorization: `Barer ${token}`,
-                    },
-                }
-            );
+            if (!isEditing) {
+                response = await axios.post(
+                    "http://localhost:5000/api/listing",
+                    createListingInputs
+                );
+            } else {
+                response = await axios.patch(
+                    `http://localhost:5000/api/listing/${editingListing?._id}`,
+                    createListingInputs
+                );
+            }
 
-            navigate(`/active-listings/${data.listing._id}`);
+            navigate(`/active-listings/${response.data.listing._id}`);
         } catch (err) {
             if (axios.isAxiosError(err)) {
-                console.log(err.response?.data);
                 setErr(err.response?.data.message || "something went wrong.");
             } else {
-                setErr("An unknow error occurred.");
+                setErr("An unknown error occurred.");
             }
         } finally {
-            setLoading(false);
+            setIsLoading(false);
         }
     };
 
     return (
         <div className="flex justify-center items-center md:pt-12 md:my-0 my-20 mx-2">
             <form
-                onSubmit={handleSubmit}
+                onSubmit={handleCreateListing}
                 className="w-[45rem] bg-gray-50 px-3 md:px-5 py-10 md:p-5 rounded-md shadow-md flex flex-col gap-4"
             >
                 {err && <InputError err={err} />}
@@ -90,13 +86,8 @@ const CreateListingPage = () => {
                     className="w-full bg-gray-200 h-[3rem] rounded-md px-5 outline-1"
                     placeholder="Title"
                     name="title"
-                    value={state.title}
-                    onChange={(e) =>
-                        dispatch({
-                            type: "create/title",
-                            payload: e.target.value,
-                        })
-                    }
+                    value={createListingInputs.title}
+                    onChange={(e) => handleInputsChange(e, "title")}
                 />
 
                 <Input
@@ -104,27 +95,19 @@ const CreateListingPage = () => {
                     className="w-full bg-gray-200 h-[3rem] rounded-md px-5 outline-1"
                     placeholder="Image"
                     name="image_url"
-                    value={state.image_url}
-                    onChange={(e) =>
-                        dispatch({
-                            type: "create/image_url",
-                            payload: e.target.value,
-                        })
-                    }
+                    value={createListingInputs.image_url}
+                    onChange={(e) => handleInputsChange(e, "image_url")}
                 />
 
                 <TextArea
                     className="w-full bg-gray-200 h-[14rem] py-2 resize-none text-start rounded-md px-5 outline-1"
                     placeholder="Description"
                     name="description"
-                    value={state.description}
-                    onChange={(e) =>
-                        dispatch({
-                            type: "create/description",
-                            payload: e.target.value,
-                        })
-                    }
-                />
+                    value={createListingInputs.description}
+                    onChange={(e) => handleInputsChange(e, "description")}
+                >
+                    {createListingInputs.description}
+                </TextArea>
 
                 <div className="flex gap-3">
                     <Input
@@ -132,34 +115,47 @@ const CreateListingPage = () => {
                         className="w-full bg-gray-200 h-[3rem] rounded-md px-5 outline-1 "
                         placeholder="Price"
                         name="price"
-                        value={state.price}
-                        onChange={(e) =>
-                            dispatch({
-                                type: "create/price",
-                                payload: e.target.value,
-                            })
-                        }
+                        value={createListingInputs.price}
+                        readOnly={isEditing}
+                        onChange={(e) => handleInputsChange(e, "price")}
                     />
                     <Select
                         name="category"
                         id="category"
                         options={options}
-                        onChange={(e) =>
-                            dispatch({
-                                type: "create/category",
-                                payload: e.target.value,
-                            })
-                        }
+                        onChange={(e) => handleInputsChange(e, "category")}
                         className="bg-gray-200 px-5 w-full rounded-md mx-2"
-                        value={state.category}
+                        value={createListingInputs.category}
                     ></Select>
                 </div>
 
-                <Button
-                    type="submit"
-                    label={loading ? "Submitting" : "Create"}
-                    className="bg-neutral-700 h-[3rem] text-white rounded-md"
-                />
+                {!isEditing && (
+                    <Button
+                        type="submit"
+                        label={isLoading ? "Submitting" : "Create"}
+                        className="bg-neutral-700 h-[3rem] text-white rounded-md"
+                    />
+                )}
+
+                {isEditing && (
+                    <div className="w-full flex gap-4 flex-col md:flex-row">
+                        <Button
+                            type="submit"
+                            label={isLoading ? "Editing" : "Edit"}
+                            className="bg-neutral-700 h-[3rem] w-full text-white rounded-md"
+                        />
+                        <Button
+                            type="button"
+                            label="Cancel"
+                            onClick={() =>
+                                navigate(
+                                    `/active-listings/${editingListing?._id}`
+                                )
+                            }
+                            className="bg-red-500 h-[3rem] w-full text-white rounded-md"
+                        />
+                    </div>
+                )}
             </form>
         </div>
     );

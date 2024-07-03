@@ -4,6 +4,7 @@ interface textAreaProps extends React.InputHTMLAttributes<HTMLTextAreaElement> {
 const TextArea = ({
     className,
     name,
+    value,
     placeholder,
     onChange,
 }: textAreaProps) => {
@@ -11,9 +12,12 @@ const TextArea = ({
         <textarea
             className={className}
             name={name}
+            value={value}
             placeholder={placeholder}
             onChange={onChange}
-        ></textarea>
+        >
+            {value}
+        </textarea>
     );
 };
 

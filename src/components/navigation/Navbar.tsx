@@ -1,6 +1,6 @@
 // libaries
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 // icons / packages
 import { GiHamburgerMenu } from "react-icons/gi";
@@ -9,18 +9,17 @@ import { IoClose } from "react-icons/io5";
 import NavLogo from "./NavLogo";
 import NavLists from "./NavLists";
 import Profile from "./Profile";
-import { useUser } from "../../ctx/authContext";
 import Button from "../ui/Button";
-
-// components
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../../redux/userSlice";
+import { RootState } from "../../redux/store";
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
-    const { user, handleLogout } = useUser();
 
-    function handleCloseMenu() {
+    const handleCloseMenu = () => {
         setIsOpen((state) => !state);
-    }
+    };
 
     return (
         <nav className="flex items-center z-10 justify-between md:px-20 px-10 py-10 fixed text-white bg-neutral-700 w-full top-0 left-0">
@@ -51,11 +50,11 @@ const Navbar = () => {
                     className=" flex flex-col text-xl gap-4 p-10 bg-neutral-700 text-white h-screen w-full"
                 />
             </Drawer>
-
+            {/* 
             {user && <Profile className="hidden md:flex gap-4" />}
 
             {!user && <Link to="login">Login</Link>}
-            <Button onClick={handleLogout} label="Logout" />
+            <Button onClick={handleLogout} label="Logout" /> */}
         </nav>
     );
 };
