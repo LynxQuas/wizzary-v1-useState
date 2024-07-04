@@ -9,6 +9,7 @@ const Input = ({
     value,
     className,
     placeholder,
+    readOnly,
     onChange,
 }: input_props) => {
     return (
@@ -16,6 +17,7 @@ const Input = ({
             type={type}
             name={name}
             value={value}
+            readOnly={readOnly}
             className={className}
             placeholder={placeholder}
             onChange={onChange}

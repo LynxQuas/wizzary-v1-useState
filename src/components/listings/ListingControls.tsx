@@ -3,9 +3,9 @@ import { IoBookmark } from "react-icons/io5";
 import { MdDelete } from "react-icons/md";
 import { Link } from "react-router-dom";
 
-const LisingControls = ({ onDelete }) => {
+const LisingControls = ({ onDelete }: { onDelete: () => void }) => {
     return (
-        <div className="absolute flex right-0 m-4 md:m-1 gap-4">
+        <div className="absolute flex right-0 my-[-2.5rem] md:m-0 gap-4">
             <Link to="edit">
                 <FaEdit size={30} className="text-blue-500 cursor-pointer" />
             </Link>

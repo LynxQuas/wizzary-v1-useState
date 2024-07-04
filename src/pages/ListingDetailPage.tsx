@@ -1,63 +1,32 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import LisingControls from "../components/listings/ListingControls";
-import { useEffect, useState } from "react";
-import axios from "axios";
-import { Listing } from "../types";
+import { useEffect } from "react";
+
 import { ClipLoader } from "react-spinners";
+import { useListing } from "../context/ListingContext";
 
 const ListingDetailPage = () => {
     const { id } = useParams();
-    console.log(id);
-
-    const [curListing, setCurListing] = useState<Listing | null>(null);
-    const [loading, setLoading] = useState(false);
-    const [err, setErr] = useState("");
-    const navigate = useNavigate();
+    const { state: listing, fetchListing, deleteListing } = useListing();
 
     const handleDeleteListing = async () => {
         const confirm = window.confirm("Are you sure ?");
-
         if (!confirm) return;
-
-        try {
-            const deletedListing = await axios.delete(
-                `http://localhost:5000/api/listing/${id}`
-            );
-            navigate("/active-listings");
-        } catch (err) {
-            console.log(err);
-        }
+        deleteListing(id);
     };
 
     useEffect(() => {
-        const getListing = async () => {
-            setLoading(true);
-            try {
-                const { data } = await axios.get(
-                    `http://localhost:5000/api/listing/${id}`
-                );
-                setCurListing(data.listing);
-            } catch (err) {
-                if (axios.isAxiosError(err)) {
-                    setErr(
-                        err.response?.data.message || "something went wrong."
-                    );
-                } else {
-                    setErr("An unknow error occurred.");
-                }
-            } finally {
-                setLoading(false);
-            }
-        };
-        getListing();
-    }, []);
+        if (id) {
+            fetchListing(id);
+        }
+    }, [id]);
 
-    if (loading) {
+    if (listing.isLoading) {
         return (
             <div className="absolute top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%]">
                 <ClipLoader
                     color="orange"
-                    loading={loading}
+                    loading={listing.isLoading}
                     size={100}
                     aria-label="Loading Spinner"
                     data-testid="loader"
@@ -66,9 +35,11 @@ const ListingDetailPage = () => {
         );
     }
 
-    if (err) {
+    if (listing.error) {
         return (
-            <h1 className="text-2xl text-center my-20 text-red-500">{err}</h1>
+            <h1 className="text-2xl text-center my-20 text-red-500">
+                {listing.error}
+            </h1>
         );
     }
 
@@ -79,7 +50,7 @@ const ListingDetailPage = () => {
 
                 <div className="shrink-0 w-full md:w-1/2">
                     <img
-                        src={curListing?.image_url}
+                        src={listing.listing?.image_url}
                         className="w-full md:w-[550px] md:h-[450px] rounded-md"
                     />
                 </div>
@@ -92,29 +63,31 @@ const ListingDetailPage = () => {
                             </p>
                         </div>
                         <small className="text-gray-400">
-                            Created at {curListing?.createdAt}
+                            Created at {listing.listing?.createdAt}
                         </small>
                     </div>
                     <h1 className="text-3xl font-bold text-amber-400 text-gary-200">
-                        {curListing?.title}
+                        {listing.listing?.title}
                     </h1>
-                    <p>{curListing?.description}</p>
+                    <p>{listing.listing?.description}</p>
                     <p className="font-bold">
                         status:{" "}
                         <span
                             className={`text-white px-2 mx-4 py-1 rounded-md ${
-                                curListing?.status === true
+                                listing.listing?.status === true
                                     ? "bg-green-500 "
                                     : "bg-red-500"
                             }`}
                         >
-                            {curListing?.status === true ? "Open" : "Close"}
+                            {listing.listing?.status === true
+                                ? "Open"
+                                : "Close"}
                         </span>
                     </p>
                     <p className=" font-bold">
                         Price:{" "}
                         <span className="text-amber-700 mx-5">
-                            ${Number(curListing?.price).toFixed(2)}
+                            ${Number(listing.listing?.price).toFixed(2)}
                         </span>
                     </p>
 

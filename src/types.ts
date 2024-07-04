@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ChangeEvent, ReactNode } from "react";
 
 export interface User {
     id: string;
@@ -46,19 +46,6 @@ export interface Register {
     confirmPassword: string;
 }
 
-export interface AuthContextProviderProps {
-    children: ReactNode;
-}
-
-// export interface AuthContextType {
-//     user: any; // Define this type according to your user data structure
-//     isLoading: boolean;
-//     handleLogin: (userData: any) => void;
-//     handleLogout: () => void;
-//     err: string;
-//     token: string | null;
-// }
-
 export interface LoginResponse {
     message: string;
     token: string;
@@ -68,3 +55,7 @@ export interface LoginResponse {
 export interface LoginError {
     message: string;
 }
+
+export type InputChangeEvent = ChangeEvent<
+    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+>;

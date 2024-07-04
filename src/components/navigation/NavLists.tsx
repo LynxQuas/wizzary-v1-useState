@@ -1,12 +1,6 @@
 import { NavLink } from "react-router-dom";
 import Profile from "./Profile";
-
-const navLinkContents = [
-    { href: "/", name: "Home" },
-    { href: "/active-listings", name: "Active Listings" },
-    { href: "/about", name: "About" },
-    { href: "/contact", name: "Contact" },
-];
+import { navLinkContents } from "../../constants";
 
 type NavlistProps = {
     className: string;

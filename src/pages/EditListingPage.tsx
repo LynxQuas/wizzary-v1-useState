@@ -1,39 +1,30 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useListing } from "../context/ListingContext";
 import CreateListingPage from "./CreateListingPage";
-import axios from "axios";
 import { useParams } from "react-router-dom";
 
 const EditListingPage = () => {
     const { id } = useParams();
-    const [curListing, setCurListing] = useState(null);
-    const [isLoading, setIsLoading] = useState(false);
-    const [err, setErr] = useState("");
+    const { state, fetchListing } = useListing();
 
     useEffect(() => {
-        const getListing = async () => {
-            setIsLoading(true);
-            try {
-                const { data } = await axios.get(
-                    `http://localhost:5000/api/listing/${id}`
-                );
-                setCurListing(data.listing);
-            } catch (err) {
-                console.log(err);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-        getListing();
-    }, []);
-    if (err) {
-        return <h1>{err}</h1>;
+        if (id) {
+            fetchListing(id);
+        }
+    }, [id]);
+
+    if (state.error) {
+        return <h1>{state.error}</h1>;
     }
-    if (isLoading) {
+    if (state.isLoading) {
         return <h1>loading...</h1>;
     }
     return (
         <div>
-            <CreateListingPage isEditing={true} editingListing={curListing} />
+            <CreateListingPage
+                isEditing={true}
+                editingListing={state.listing}
+            />
         </div>
     );
 };

@@ -15,7 +15,7 @@ const Card = ({ listing }: { listing: Listing }) => {
                 <p>
                     Price: $<b>{listing.price}</b>
                 </p>
-                <p>Create at: {listing.created_at} </p>
+                <p>Create at: {listing.createdAt} </p>
                 <Link
                     to={`${listing._id}`}
                     className="bg-amber-500 text-white font-semibold p-2 w-[6rem] rounded-md shadow-sm  text-center"
