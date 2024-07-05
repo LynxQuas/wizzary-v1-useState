@@ -1,7 +1,7 @@
 import { useEffect } from "react";
+import { useParams } from "react-router-dom";
 import { useListing } from "../context/ListingContext";
 import CreateListingPage from "./CreateListingPage";
-import { useParams } from "react-router-dom";
 
 const EditListingPage = () => {
     const { id } = useParams();

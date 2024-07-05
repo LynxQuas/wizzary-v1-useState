@@ -6,6 +6,12 @@ import CreateListingPage from "./pages/CreateListingPage";
 import ListingDetailPage from "./pages/ListingDetailPage";
 import EditListingPage from "./pages/EditListingPage";
 
+import LoginPage from "./pages/LoginPage";
+import PrivateRoute from "./pages/PrivateRoute";
+import AuthProvider from "./context/AuthContext";
+import RegisterPage from "./pages/RegisterPage";
+import ProfilePage from "./pages/ProfilePage";
+
 const App = () => {
     const router = createBrowserRouter([
         {
@@ -16,21 +22,37 @@ const App = () => {
                 { path: "active-listings", element: <ActiveListingPage /> },
                 { path: "contact", element: <h1>Contact Page</h1> },
                 { path: "about", element: <h1>About Page</h1> },
-                { path: "login", element: <h1>Login Page </h1> },
-                { path: "register", element: <h1>Register Page</h1> },
+                { path: "login", element: <LoginPage /> },
+                { path: "register", element: <RegisterPage /> },
                 {
                     path: "create-listing",
-                    element: <CreateListingPage isEditing={false} />,
+                    element: (
+                        <PrivateRoute>
+                            <CreateListingPage isEditing={false} />
+                        </PrivateRoute>
+                    ),
                 },
                 { path: "active-listings/:id", element: <ListingDetailPage /> },
                 {
                     path: "active-listings/:id/edit",
                     element: <EditListingPage />,
                 },
+                {
+                    path: "profile",
+                    element: (
+                        <PrivateRoute>
+                            <ProfilePage />
+                        </PrivateRoute>
+                    ),
+                },
             ],
         },
     ]);
-    return <RouterProvider router={router} />;
+    return (
+        <AuthProvider>
+            <RouterProvider router={router} />
+        </AuthProvider>
+    );
 };
 
 export default App;

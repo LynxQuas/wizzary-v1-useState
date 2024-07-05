@@ -1,7 +1,8 @@
-import axios from "axios";
 import React, { createContext, useContext, useReducer } from "react";
-import { ListingInput } from "../types";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
+
+import { ListingInput } from "../types";
 import {
     ListingState,
     fetchListingInitialState,
@@ -17,9 +18,9 @@ interface ListingContextProviderProps {
 export const ListingContext = createContext<{
     state: ListingState;
     fetchListing: (id: string | undefined) => Promise<void>;
-    createListing: (inputs: any) => Promise<void>;
-    editListing: (id: string, inputs: any) => Promise<void>;
-    deleteListing: (id: string | undefined) => Promise<void>;
+    createListing: (inputs: any, token: string) => Promise<void>;
+    editListing: (id: string, inputs: any, token: string) => Promise<void>;
+    deleteListing: (id: string | undefined, token: string) => Promise<void>;
 }>({
     state: fetchListingInitialState,
     fetchListing: async () => {},
@@ -29,11 +30,12 @@ export const ListingContext = createContext<{
 });
 
 const ListingContextProvider = ({ children }: ListingContextProviderProps) => {
+    const navigate = useNavigate();
+
     const [state, dispatch] = useReducer(
         listingFetchReducer,
         fetchListingInitialState
     );
-    const navigate = useNavigate();
 
     const handleAxiosError = (error: any) => {
         if (axios.isAxiosError(error)) {
@@ -59,10 +61,15 @@ const ListingContextProvider = ({ children }: ListingContextProviderProps) => {
         }
     };
 
-    const createListing = async (inputs: ListingInput) => {
+    const createListing = async (inputs: ListingInput, token: string) => {
         try {
             dispatch({ type: "PENDING" });
-            const { data } = await axios.post(BASE_URL, inputs);
+            const { data } = await axios.post(BASE_URL, inputs, {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Barer ${token}`,
+                },
+            });
             dispatch({ type: "SUCCESS", payload: data.listing });
             navigate(`/active-listings/${data.listing._id}`);
         } catch (error) {
@@ -72,11 +79,17 @@ const ListingContextProvider = ({ children }: ListingContextProviderProps) => {
 
     const editListing = async (
         id: string | undefined | null,
-        inputs: ListingInput
+        inputs: ListingInput,
+        token: string
     ) => {
         try {
             dispatch({ type: "PENDING" });
-            const { data } = await axios.patch(`${BASE_URL}/${id}`, inputs);
+            const { data } = await axios.patch(`${BASE_URL}/${id}`, inputs, {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Barer ${token}`,
+                },
+            });
             dispatch({ type: "SUCCESS", payload: data.listing });
             navigate(`/active-listings/${data.listing._id}`);
         } catch (error) {
@@ -84,10 +97,15 @@ const ListingContextProvider = ({ children }: ListingContextProviderProps) => {
         }
     };
 
-    const deleteListing = async (id: string | undefined) => {
+    const deleteListing = async (id: string | undefined, token: string) => {
         try {
             dispatch({ type: "PENDING" });
-            await axios.delete(`${BASE_URL}/${id}`);
+            await axios.delete(`${BASE_URL}/${id}`, {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Barer ${token}`,
+                },
+            });
             dispatch({ type: "DELETE_SUCCESSED" });
             navigate("/active-listings");
         } catch (error) {

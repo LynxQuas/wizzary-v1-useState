@@ -4,15 +4,24 @@ import { useEffect } from "react";
 
 import { ClipLoader } from "react-spinners";
 import { useListing } from "../context/ListingContext";
+import { useAuth } from "../context/AuthContext";
+import useCreator from "../hooks/useCreator";
+import ListingCreator from "../components/listings/ListingCreator";
 
 const ListingDetailPage = () => {
     const { id } = useParams();
+    const { user: curUser, token } = useAuth();
     const { state: listing, fetchListing, deleteListing } = useListing();
+    const {
+        user: creator,
+        isLoading,
+        err,
+    } = useCreator(listing.listing?.creator);
 
     const handleDeleteListing = async () => {
         const confirm = window.confirm("Are you sure ?");
         if (!confirm) return;
-        deleteListing(id);
+        token && deleteListing(id, token);
     };
 
     useEffect(() => {
@@ -45,8 +54,12 @@ const ListingDetailPage = () => {
 
     return (
         <div className="my-4 relative -z-0">
-            <div className="flex flex-col md:flex-col lg:flex-row gap-6 bg-white py-10 px-5 rounded-md shadow-md">
-                <LisingControls onDelete={handleDeleteListing} />
+            <div className="flex flex-col md:flex-col lg:flex-row gap-6 bg-white py-10 px-5 rounded-md shadow-md md:mx-4 mx-2">
+                <LisingControls
+                    onDelete={handleDeleteListing}
+                    creator={creator}
+                    curUser={curUser}
+                />
 
                 <div className="shrink-0 w-full md:w-1/2">
                     <img
@@ -55,17 +68,10 @@ const ListingDetailPage = () => {
                     />
                 </div>
                 <div className="flex flex-col gap-8">
-                    <div className="flex gap-8 items-center md:mb-2">
-                        <div className="flex items-center gap-4">
-                            <div className="w-[3rem] h-[3rem] bg-black rounded-full"></div>
-                            <p className="font-bold">
-                                {/* {listingCreator?.user.name} */}
-                            </p>
-                        </div>
-                        <small className="text-gray-400">
-                            Created at {listing.listing?.createdAt}
-                        </small>
-                    </div>
+                    <ListingCreator
+                        createdAt={listing.listing?.createdAt}
+                        creator={creator}
+                    />
                     <h1 className="text-3xl font-bold text-amber-400 text-gary-200">
                         {listing.listing?.title}
                     </h1>
@@ -91,15 +97,21 @@ const ListingDetailPage = () => {
                         </span>
                     </p>
 
-                    <div className="flex gap-4">
-                        <button className="bg-neutral-700 font-semibold text-white w-[10rem] px-4 py-2 rounded-md">
-                            Add Bid
-                        </button>
+                    {curUser && (
+                        <div className="flex gap-4">
+                            {creator?.id !== curUser?.id && (
+                                <button className="bg-neutral-700 font-semibold text-white w-[10rem] px-4 py-2 rounded-md">
+                                    Add Bid
+                                </button>
+                            )}
 
-                        <button className="bg-amber-600 font-semibold text-white w-[10rem] px-4 py-2 rounded-md">
-                            Close
-                        </button>
-                    </div>
+                            {creator?.id === curUser?.id && (
+                                <button className="bg-amber-600 font-semibold text-white w-[10rem] px-4 py-2 rounded-md">
+                                    Close
+                                </button>
+                            )}
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

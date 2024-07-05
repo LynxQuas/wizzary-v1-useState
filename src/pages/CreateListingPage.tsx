@@ -1,15 +1,19 @@
 import { FormEvent, useReducer } from "react";
+import { useNavigate } from "react-router-dom";
+
+import { listingInputReducer } from "../components/reducers/listingInputReducer";
+import { listingInputInitialState } from "../components/reducers/listingInputReducer";
+import { listing_category } from "../constants";
+
+import { useListing } from "../context/ListingContext";
+
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
 import Select from "../components/ui/Select";
 import TextArea from "../components/ui/TextArea";
-import { InputChangeEvent, Listing } from "../types";
 import InputError from "../components/ui/InputError";
-import { useNavigate } from "react-router-dom";
-import { listingInputReducer } from "../components/reducers/listingInputReducer";
-import { listing_category } from "../constants";
-import { useListing } from "../context/ListingContext";
-import { listingInputInitialState } from "../components/reducers/listingInputReducer";
+import { InputChangeEvent, Listing } from "../types";
+import { useAuth } from "../context/AuthContext";
 
 export interface CreateListingProps {
     isEditing: boolean;
@@ -21,6 +25,7 @@ const CreateListingPage = ({
     editingListing,
 }: CreateListingProps) => {
     const navigate = useNavigate();
+    const { user, token } = useAuth();
     const { state: listing, createListing, editListing } = useListing();
 
     const [state, dispatch] = useReducer(listingInputReducer, {
@@ -35,12 +40,12 @@ const CreateListingPage = ({
 
     const handleCreateListing = async (e: FormEvent) => {
         e.preventDefault();
-        console.log(state);
+        const listingData = { ...state, creator: user?.id };
         if (isEditing && editingListing?._id) {
             const id = editingListing._id;
-            editListing(id, state);
+            token && editListing(id, state, token);
         } else {
-            createListing(state);
+            token && createListing(listingData, token);
         }
     };
 

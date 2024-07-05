@@ -1,11 +1,14 @@
-import { Navigate, Outlet } from "react-router-dom";
-import { useUser } from "../ctx/authContext";
+import { Navigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { PropsWithChildren } from "react";
 
-const PrivateRoute = () => {
-    const { token } = useUser();
+type PrivateRouteProps = PropsWithChildren;
 
-    if (!token) return <Navigate to="/login" />;
-    return <Outlet />;
+const PrivateRoute = ({ children }: PrivateRouteProps) => {
+    const { user } = useAuth();
+
+    if (!user) return <Navigate to="/login" />;
+    return children;
 };
 
 export default PrivateRoute;

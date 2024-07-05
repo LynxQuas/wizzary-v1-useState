@@ -1,6 +1,6 @@
 // libaries
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 // icons / packages
 import { GiHamburgerMenu } from "react-icons/gi";
@@ -9,13 +9,11 @@ import { IoClose } from "react-icons/io5";
 import NavLogo from "./NavLogo";
 import NavLists from "./NavLists";
 import Profile from "./Profile";
-import Button from "../ui/Button";
-import { useDispatch, useSelector } from "react-redux";
-import { logout } from "../../redux/userSlice";
-import { RootState } from "../../redux/store";
+import { useAuth } from "../../context/AuthContext";
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
+    const { user } = useAuth();
 
     const handleCloseMenu = () => {
         setIsOpen((state) => !state);
@@ -50,11 +48,9 @@ const Navbar = () => {
                     className=" flex flex-col text-xl gap-4 p-10 bg-neutral-700 text-white h-screen w-full"
                 />
             </Drawer>
-            {/* 
-            {user && <Profile className="hidden md:flex gap-4" />}
+            {user && <Profile className="hidden md:flex gap-2 items-center" />}
 
             {!user && <Link to="login">Login</Link>}
-            <Button onClick={handleLogout} label="Logout" /> */}
         </nav>
     );
 };

@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Listing } from "../../types";
+import { timeFormatter } from "../../utils/helper";
 
 const Card = ({ listing }: { listing: Listing }) => {
     return (
@@ -8,14 +9,20 @@ const Card = ({ listing }: { listing: Listing }) => {
                 <img src={listing.image_url} width={240} height={100} />
             </div>
 
-            <div className="flex flex-col gap-4 flex-wrap">
+            <div className="flex flex-col gap-3 flex-wrap">
                 <h1 className="md:text-2xl text-xl text-amber-500 font-bold">
                     {listing.title}
                 </h1>
                 <p>
+                    <span className="text-gray-400">
+                        {timeFormatter(listing.createdAt!)}
+                    </span>{" "}
+                </p>
+                <p className="">{listing.description.slice(0, 60)}...</p>
+                <p>
                     Price: $<b>{listing.price}</b>
                 </p>
-                <p>Create at: {listing.createdAt} </p>
+
                 <Link
                     to={`${listing._id}`}
                     className="bg-amber-500 text-white font-semibold p-2 w-[6rem] rounded-md shadow-sm  text-center"
