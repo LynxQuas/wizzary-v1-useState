@@ -7,21 +7,33 @@ import { useListing } from "../context/ListingContext";
 import { useAuth } from "../context/AuthContext";
 import useCreator from "../hooks/useCreator";
 import ListingCreator from "../components/listings/ListingCreator";
+import ListingActions from "../components/listings/ListingActions";
+import ListingStatus from "../components/listings/ListingStatus";
 
 const ListingDetailPage = () => {
     const { id } = useParams();
     const { user: curUser, token } = useAuth();
-    const { state: listing, fetchListing, deleteListing } = useListing();
     const {
-        user: creator,
-        isLoading,
-        err,
-    } = useCreator(listing.listing?.creator);
+        state: listing,
+        fetchListing,
+        deleteListing,
+        editListing,
+    } = useListing();
+    const { user: creator } = useCreator(listing.listing?.creator);
 
     const handleDeleteListing = async () => {
         const confirm = window.confirm("Are you sure ?");
         if (!confirm) return;
         token && deleteListing(id, token);
+    };
+
+    const handleCloseListing = () => {
+        if (!listing.listing || !token) return;
+        editListing(
+            listing?.listing?._id,
+            { ...listing.listing, status: false },
+            token
+        );
     };
 
     useEffect(() => {
@@ -72,24 +84,15 @@ const ListingDetailPage = () => {
                         createdAt={listing.listing?.createdAt}
                         creator={creator}
                     />
+
                     <h1 className="text-3xl font-bold text-amber-400 text-gary-200">
                         {listing.listing?.title}
                     </h1>
+
                     <p>{listing.listing?.description}</p>
-                    <p className="font-bold">
-                        status:{" "}
-                        <span
-                            className={`text-white px-2 mx-4 py-1 rounded-md ${
-                                listing.listing?.status === true
-                                    ? "bg-green-500 "
-                                    : "bg-red-500"
-                            }`}
-                        >
-                            {listing.listing?.status === true
-                                ? "Open"
-                                : "Close"}
-                        </span>
-                    </p>
+
+                    <ListingStatus listing={listing.listing} />
+
                     <p className=" font-bold">
                         Price:{" "}
                         <span className="text-amber-700 mx-5">
@@ -97,21 +100,12 @@ const ListingDetailPage = () => {
                         </span>
                     </p>
 
-                    {curUser && (
-                        <div className="flex gap-4">
-                            {creator?.id !== curUser?.id && (
-                                <button className="bg-neutral-700 font-semibold text-white w-[10rem] px-4 py-2 rounded-md">
-                                    Add Bid
-                                </button>
-                            )}
-
-                            {creator?.id === curUser?.id && (
-                                <button className="bg-amber-600 font-semibold text-white w-[10rem] px-4 py-2 rounded-md">
-                                    Close
-                                </button>
-                            )}
-                        </div>
-                    )}
+                    <ListingActions
+                        curUser={curUser}
+                        creator={creator}
+                        handleCloseListing={handleCloseListing}
+                        curListing={listing?.listing}
+                    />
                 </div>
             </div>
         </div>

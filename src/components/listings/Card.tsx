@@ -1,10 +1,12 @@
 import { Link } from "react-router-dom";
 import { Listing } from "../../types";
-import { timeFormatter } from "../../utils/helper";
+import ListingCreator from "./ListingCreator";
+import useCreator from "../../hooks/useCreator";
 
 const Card = ({ listing }: { listing: Listing }) => {
+    const { user: creator } = useCreator(listing.creator);
     return (
-        <div className="flex w-full bg-white justify-between flex-col rounded-md shadow-md p-6 md:w-[20rem]">
+        <div className="flex w-full bg-white justify-between gap-8 flex-col rounded-md shadow-md p-6 md:w-[23rem]">
             <div className="rounded-md overflow-clip shrink-0 self-center">
                 <img src={listing.image_url} width={240} height={100} />
             </div>
@@ -13,11 +15,12 @@ const Card = ({ listing }: { listing: Listing }) => {
                 <h1 className="md:text-2xl text-xl text-amber-500 font-bold">
                     {listing.title}
                 </h1>
-                <p>
-                    <span className="text-gray-400">
-                        {timeFormatter(listing.createdAt!)}
-                    </span>{" "}
-                </p>
+
+                <ListingCreator
+                    creator={creator}
+                    createdAt={listing.createdAt}
+                />
+
                 <p className="">{listing.description.slice(0, 60)}...</p>
                 <p>
                     Price: $<b>{listing.price}</b>

@@ -18,10 +18,7 @@ const ListingCreator = ({ creator, createdAt }: LisingControlsProps) => {
                     alt="profile"
                     className="rounded-full w-10 h-10"
                 />
-                <Link
-                    to="/profile"
-                    className="font-bold text-xl hover:text-blue-500"
-                >
+                <Link to="/profile" className="font-bold  hover:text-blue-500">
                     {creator?.name}
                 </Link>
                 {creator?.id === curUser?.id && (

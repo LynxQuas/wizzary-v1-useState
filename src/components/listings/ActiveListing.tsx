@@ -24,7 +24,7 @@ const ActiveListing = () => {
     }
 
     return (
-        <div className="flex gap-4 md:px-10 flex-wrap md:justify-normal md:justify-center">
+        <div className="flex gap-4 md:px-10 flex-wrap md:justify-center">
             {error && <h1 className="text-2xl text-red-500">{error}</h1>}
 
             {activeListings?.length === 0 && (
