@@ -21,7 +21,7 @@ const LisingControls = ({
 
     if (curUser.id !== creator?.id) {
         return (
-            <div className="absolute flex right-4 md:right-8 my-[-2rem] md:m-0 gap-4">
+            <div className="absolute flex right-4 md:right-8 my-[-4rem] gap-4">
                 <IoBookmark
                     size={30}
                     className="text-amber-600 cursor-pointer"

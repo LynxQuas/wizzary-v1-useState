@@ -11,7 +11,7 @@ interface LisingControlsProps {
 const ListingCreator = ({ creator, createdAt }: LisingControlsProps) => {
     const { user: curUser } = useAuth();
     return (
-        <div className="flex gap-8 items-center md:mb-2">
+        <div className="flex gap-8 items-center md:mb-2 border shadow-md p-2">
             <div className="flex items-center gap-4">
                 <img
                     src={creator?.profile_image}
@@ -23,7 +23,7 @@ const ListingCreator = ({ creator, createdAt }: LisingControlsProps) => {
                 </Link>
                 {creator?.id === curUser?.id && (
                     <div className="bg-blue-500 py-1 px-2 rounded-md">
-                        <span className="text-white">You</span>
+                        <span className="text-white text-sm">You</span>
                     </div>
                 )}
                 <p className="text-gray-400">{timeFormatter(createdAt!)}</p>

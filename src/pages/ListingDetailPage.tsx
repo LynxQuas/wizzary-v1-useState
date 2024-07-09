@@ -19,7 +19,7 @@ const ListingDetailPage = () => {
         deleteListing,
         editListing,
     } = useListing();
-    const { user: creator } = useCreator(listing.listing?.creator);
+    const { user: creator, isLoading } = useCreator(listing.listing?.creator);
 
     const handleDeleteListing = async () => {
         const confirm = window.confirm("Are you sure ?");
@@ -100,12 +100,14 @@ const ListingDetailPage = () => {
                         </span>
                     </p>
 
-                    <ListingActions
-                        curUser={curUser}
-                        creator={creator}
-                        handleCloseListing={handleCloseListing}
-                        curListing={listing?.listing}
-                    />
+                    {!isLoading && (
+                        <ListingActions
+                            curUser={curUser}
+                            creator={creator}
+                            handleCloseListing={handleCloseListing}
+                            curListing={listing?.listing}
+                        />
+                    )}
                 </div>
             </div>
         </div>

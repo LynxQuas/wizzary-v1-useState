@@ -4,9 +4,14 @@ import ListingCreator from "./ListingCreator";
 import useCreator from "../../hooks/useCreator";
 
 const Card = ({ listing }: { listing: Listing }) => {
-    const { user: creator } = useCreator(listing.creator);
+    const { user: creator, isLoading } = useCreator(listing.creator);
+
+    if (isLoading) return;
+
     return (
         <div className="flex w-full bg-white justify-between gap-8 flex-col rounded-md shadow-md p-6 md:w-[23rem]">
+            <ListingCreator creator={creator} createdAt={listing.createdAt} />
+
             <div className="rounded-md overflow-clip shrink-0 self-center">
                 <img src={listing.image_url} width={240} height={100} />
             </div>
@@ -16,12 +21,7 @@ const Card = ({ listing }: { listing: Listing }) => {
                     {listing.title}
                 </h1>
 
-                <ListingCreator
-                    creator={creator}
-                    createdAt={listing.createdAt}
-                />
-
-                <p className="">{listing.description.slice(0, 60)}...</p>
+                <p>{listing.description.slice(0, 60)}...</p>
                 <p>
                     Price: $<b>{listing.price}</b>
                 </p>

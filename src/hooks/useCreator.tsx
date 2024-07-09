@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { User } from "../types";
 import axios from "axios";
 
+// get the userId and return the use object.
 const useCreator = (userId: string | undefined) => {
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(false);
